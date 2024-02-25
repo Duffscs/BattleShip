@@ -1,0 +1,11 @@
+services:
+  frontend:
+    image: mon-app
+    ports:
+      - "7242:80"
+    depends_on:
+      - backend
+  backend:
+    image: mon-api
+    ports:
+      - "7202:7202"

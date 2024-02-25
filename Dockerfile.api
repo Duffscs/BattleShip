@@ -1,0 +1,17 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS publish
+
+COPY . .
+
+RUN dotnet restore
+
+RUN dotnet publish ./BattleShip.API/BattleShip.API.csproj -c Release -o ./publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+
+COPY --from=publish /publish /app
+
+WORKDIR /app
+
+EXPOSE 7202
+
+ENTRYPOINT ["dotnet", "BattleShip.API.dll"]
