@@ -1,0 +1,23 @@
+﻿<style>
+	.mud-dialog-width-sm {
+		max-width: none !important;
+	}
+</style>
+<MudDialog>
+	<DialogContent>
+		<MudTextField T="string" Label="Code" @bind-Value=@input></MudTextField>
+	</DialogContent>
+	<DialogActions>
+		<MudButton OnClick="Cancel">Annuler</MudButton>
+		<MudButton Color="Color.Primary" OnClick="Submit">Valider</MudButton>
+	</DialogActions>
+</MudDialog>
+
+@code {
+	private string input = string.Empty;
+	[CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+	void Submit() => MudDialog.Close(DialogResult.Ok(this.input));
+	void Cancel() => MudDialog.Cancel();
+}
+

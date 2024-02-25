@@ -1,0 +1,11 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudPaper Width="100vw" Height="100vh" Elevation="0"
+		  Class="d-flex justify-center align-center flex-grow-1 gap-4"
+		  Style="background: url(fond.webp) no-repeat center center fixed;background-size: cover;">
+	<AccessControl />
+	@Body
+</MudPaper>

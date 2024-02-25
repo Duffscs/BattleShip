@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@inject NavigationManager Navigation
+
+<style>
+    .log-bar {
+	    position: fixed;
+        top : 0;    
+        background:white;
+        width: 100%;
+    }
+
+</style>
+
+<AuthorizeView>
+    <Authorized>
+        <div class="log-bar">
+            Hello, @context.User.Identity!.Name!
+            <a href="#" @onclick="BeginSignOut">Log out</a>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="log-bar">
+            <a href="authentication/login">Log in</a>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private void BeginSignOut(MouseEventArgs args) {
+        Navigation.NavigateToLogout("authentication/logout");
+    }
+}

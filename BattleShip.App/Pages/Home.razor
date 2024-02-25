@@ -1,0 +1,51 @@
+﻿@page "/"
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+@inject GameService GameService
+
+@attribute [Authorize]
+
+<PageTitle>Home</PageTitle>
+
+<MudButton @onclick="CreateGame" Variant="Variant.Filled" Color="Color.Primary">Créer une partie</MudButton>
+<MudButton @onclick="JoinGame" Variant="Variant.Filled" Color="Color.Secondary">Rejoindre une partie</MudButton>
+
+@code {
+
+	bool gameFinished;
+
+	public async Task CreateGame() {
+		try {
+			var res = await Http.PostAsJsonAsync("/CreateGame", new CreateGameCommand { Ai = true, AiDifficulty = 0 });
+			if (res.IsSuccessStatusCode) {
+				CreateGameDto game = await res.Content.ReadFromJsonAsync<CreateGameDto>();
+				NavigationManager.NavigateTo($"/{game.Id}");
+			} else {
+				Snackbar.Add("Erreur lors de la création de la partie", Severity.Error);
+			}
+		} catch (AccessTokenNotAvailableException exception) {
+			exception.Redirect();
+		}
+	}
+
+	public async Task JoinGame() {
+		var res = await DialogService.Show<GameCodeDialog>("Saisir un code parti", new DialogOptions() { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraLarge }).Result;
+		if (res.Canceled) {
+			return;
+		}
+		string code = (string)res.Data;
+		if (!Guid.TryParse(code, out Guid gameId)) {
+			Snackbar.Add("Code invalide", Severity.Error);
+			return;
+		}
+
+		var response = await Http.GetAsync($"/ExistGame/{gameId}");
+		if (!response.IsSuccessStatusCode) {
+			Snackbar.Add("Cette partie n'existe pas", Severity.Error);
+			return;
+		}
+		NavigationManager.NavigateTo($"/{gameId}");
+	}
+}

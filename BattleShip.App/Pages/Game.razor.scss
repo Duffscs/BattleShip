@@ -1,0 +1,58 @@
+﻿:root {
+}
+
+.container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 5px;
+    width: fit-content;
+    height: fit-content;
+    --grid-cell-color: transparent;
+    --grid-cell-size: 50px;
+    --grid-cell-image: none;
+
+    .cell {
+        width: var(--grid-cell-size);
+        height: var(--grid-cell-size);
+        //background-color: var(--grid-cell-color);
+        background-image: var(--grid-cell-image);
+        background-size: 32px;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: solid black 1px;
+        background-color: transparent;
+
+        &.sunken {
+            //--grid-cell-color: black;
+            --grid-cell-image: url('sunken.svg')
+        }
+
+        &.hitted {
+            //--grid-cell-color: red;
+            --grid-cell-image: url('hit.svg')
+        }
+
+        &.missed {
+            //--grid-cell-color: orange;
+            --grid-cell-image: url('missed.svg')
+        }
+    }
+}
+
+.hit-history {
+    overflow: scroll;
+    height: 100vh;
+    position: fixed;
+    right: 0;
+    top: 20px;
+    background-color: white;
+}

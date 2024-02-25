@@ -1,0 +1,63 @@
+﻿<h3>Grid</h3>
+
+<div class="grid @ClassName">
+	@for (int i = 0; i < GridSize; i++) {
+		@for (int j = 0; j < GridSize; j++) {
+			(int row, int col) = (i, j);
+			<div class="cell @HitStateString(i,j)" @onclick="() => OnClick(row , col)"></div>
+		}
+	}
+</div>
+
+@code {
+
+	[Parameter]
+	public int GridSize { get; set; }
+
+	[Parameter]
+	public string? ClassName { get; set; }
+
+	[Parameter]
+	public Action<int, int> OnClick { get; set; } = (i, j) => { };
+
+	[Parameter]
+	public List<Hit> Hits {
+		get => hits;
+		set {
+			hits = value;
+			hits.Sort((a, b) => a.X == b.X ? a.Y.CompareTo(b.Y) : a.X.CompareTo(b.X));
+			StateHasChanged();
+		}
+	}
+
+	private List<Hit> hits = new List<Hit>();
+
+	public void AddHit(Hit hit) {
+		for (int i = 0; i < hits.Count; i++) {
+			if (hits[i].X > hit.X || (hits[i].X == hit.X && hits[i].Y > hit.Y)) {
+				hits.Insert(i, hit);
+				StateHasChanged();
+				return;
+			}
+		}
+
+	}
+
+	protected override Task OnInitializedAsync() { return Task.CompletedTask; }
+
+	private string HitStateString(int i, int j) {
+
+		Hit? hit = null;
+		for (int k = 0; k < hits.Count; k++) {
+			if(hits[k].Y > j || hits[k].X > i && hits[k].Y >= j)
+				break;
+			if(hits[k].X == i && hits[k].Y == j)
+				hit = hits[k];
+		}
+
+		return hit switch {
+			null => "", { HasSunk: true } => "sunken", { HasHit: true } => "hitted",
+			_ => "missed"
+		};
+	}
+}

@@ -1,0 +1,61 @@
+﻿.container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 5px;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  --grid-cell-color: transparent;
+  --grid-cell-size: 50px;
+  --grid-cell-image: none;
+}
+.grid .cell {
+  width: var(--grid-cell-size);
+  height: var(--grid-cell-size);
+  background-image: var(--grid-cell-image);
+  background-size: 32px;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  border: solid black 1px;
+}
+.grid .cell.sunken {
+  --grid-cell-image: url("sunken.svg") ;
+}
+.grid .cell.hitted {
+  --grid-cell-image: url("hit.svg") ;
+}
+.grid .cell.missed {
+  --grid-cell-image: url("missed.svg") ;
+}
+
+.hit-history {
+  overflow: scroll;
+  height: 100vh;
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+/*# sourceMappingURL=C:\Users\duffs\Desktop\code\BatailleNaval\BattleShip.App\Pages\Game.razor.css.map */

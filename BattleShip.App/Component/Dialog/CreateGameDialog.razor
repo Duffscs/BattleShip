@@ -1,0 +1,20 @@
+﻿<MudDialog>
+	<DialogContent>
+		<MudSlider @bind-Value="Size" Min="50" Max="30" Color="Color.Info">Taille de la grille: @Size.ToString()</MudSlider>
+			<MudCheckBox @bind-Value="@Ai" Label="Ai" Color="Color.Primary"></MudCheckBox>
+		</DialogContent>
+		<DialogActions>
+			<MudButton OnClick="Cancel">Annuler</MudButton>
+			<MudButton Color="Color.Primary" OnClick="Submit">Valider</MudButton>
+		</DialogActions>
+	</MudDialog>
+
+	@code {
+	private int Size = 10;
+	private bool Ai = false;
+	[CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+	void Submit() => MudDialog.Close(DialogResult.Ok(new { Size, Ai }));
+	void Cancel() => MudDialog.Cancel();
+}
+
