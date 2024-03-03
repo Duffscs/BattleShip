@@ -63,6 +63,10 @@ jobs:
         if: steps.check_image_app.run != 'Docker image not found' && steps.check_image_api.run != 'Docker image not found'
         run: |
           docker tag ${{ secrets.DOCKER_USERNAME }}/battleship.app:master-${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/battleship.app:${{ github.event.release.tag_name }}
+          docker tag ${{ secrets.DOCKER_USERNAME }}/battleship.app:master-${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/battleship.app:latest
           docker tag ${{ secrets.DOCKER_USERNAME }}/battleship.api:master-${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/battleship.api:${{ github.event.release.tag_name }}
+          docker tag ${{ secrets.DOCKER_USERNAME }}/battleship.api:master-${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/battleship.api:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/battleship.app:${{ github.event.release.tag_name }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/battleship.app:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/battleship.api:${{ github.event.release.tag_name }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/battleship.api:latest
