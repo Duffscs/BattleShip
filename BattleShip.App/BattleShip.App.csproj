@@ -25,7 +25,7 @@
 	  <Folder Include="wwwroot\image\" />
 	</ItemGroup>
 
-	<Target Name="CompileStaticAssets" AfterTargets="BeforeBuild">
+	<Target Name="CompileStaticAssets" AfterTargets="BeforeBuild" Condition=" '$(Configuration)' == 'Dev' ">
 		<Exec Command="webcompiler -r $(MSBuildProjectDirectory) -c $(MSBuildProjectDirectory)/webcompilerconfiguration.json -p disable" StandardOutputImportance="high" StandardErrorImportance="high" />
 	</Target>
 
