@@ -1,2 +1,2 @@
 ﻿namespace BattleShip.Models; 
-public record struct CreateGameDto(Guid Id) { }
+public record class CreateGameDto(Guid Id) { }

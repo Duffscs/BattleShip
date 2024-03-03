@@ -2,3 +2,7 @@ bin/
 obj/
 .vs/
 .vscode/
+certs/
+out/
+TestResults/
+.env

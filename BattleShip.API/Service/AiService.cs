@@ -6,21 +6,21 @@ public class AiService {
 
 	public Position GetNextMove(Game game) {
 		return game.AiDifficulty switch {
-			1 => RandomStategy(game, game.PlayerOneGrid),
-			2 => HuntStategy(game, game.PlayerOneGrid),
-			3 => ProbabilisticStategy(game, game.PlayerOneGrid),
-			_ => RandomStategy(game, game.PlayerOneGrid)
+			1 => RandomStrategy(game, game.PlayerOneGrid),
+			2 => HuntStrategy(game, game.PlayerOneGrid),
+			3 => HardStrategy(game, game.PlayerOneGrid),
+			_ => RandomStrategy(game, game.PlayerOneGrid)
 		};
 	}
 
-	private Position RandomStategy(Game game, Grid grid) {
+	private Position RandomStrategy(Game game, Grid grid) {
 		if (game.OpponentAvailablePosition == null) {
 			Position[] availableHits = new Position[grid.Size * grid.Size];
-			for (int i = 0; i < grid.Size; i++) {
-				for (int j = 0; j < grid.Size; j++) {
-					if(game.PlayerTwoGrid.Hits.Any(hit => hit.X == i && hit.Y == j))
+			for (int row = 0; row < grid.Size; row++) {
+				for (int col = 0; col < grid.Size; col++) {
+					if (game.PlayerOneGrid.Hits.Any(hit => hit.Col == col && hit.Row == row))
 						continue;
-					availableHits[i * grid.Size + j] = new(i, j);
+					availableHits[row * grid.Size + col] = new(row, col);
 				}
 			}
 			Random.Shared.Shuffle(availableHits);
@@ -29,81 +29,54 @@ public class AiService {
 		return game.OpponentAvailablePosition.Dequeue();
 	}
 
-	private Position HuntStategy(Game game, Grid grid) {
-		Hit lastHit = grid.Hits.FirstOrDefault(hit => hit.HasHit);
-		if (lastHit == null || lastHit.HasSunk) {
-			return RandomStategy(game, grid);
-		}
-
+	private Position HuntStrategy(Game game, Grid grid) {
 		(int dx, int dy)[] directions = [
-			(lastHit.X + 1, lastHit.Y), // right
-			(lastHit.X - 1, lastHit.Y), // left
-			(lastHit.X, lastHit.Y + 1), // down
-			(lastHit.X, lastHit.Y - 1) // up
+			(1, 0), // right
+			(-1, 0), // left
+			(0, 1), // down
+			(0, -1) // up
 		];
+		return Hunt(game, grid, directions);
+	}
 
-		foreach (var (x, y) in directions) {
-			if (!(x >= 0 && x < grid.Size && y >= 0 && y < grid.Size))
-				continue; //isntInBounds
-			if (!grid.Hits.Any(hit => hit.X == x && hit.Y == y)) { // isntPlayed
-				return new Position(x, y);
-			}
+	private Position HardStrategy(Game game, Grid grid) {
+		(int dx, int dy)[] directions = [
+			(1, 0),
+			(-1, 0),
+			(0, 1),
+			(0, -1),
+			(1, 1),
+			(-1, -1),
+			(1, -1),
+			(-1, 1)
+		];
+		return Hunt(game, grid, directions);
+	}
+
+	private Position Hunt(Game game, Grid grid, (int dx, int dy)[] directions) {
+		var successfulHits = grid.Hits.Where(hit => hit.HasHit && !hit.HasSunk).ToList();
+
+		if (successfulHits.Count == 0) {
+			return RandomStrategy(game, grid);
 		}
-		return RandomStategy(game, grid);
-	}
 
-	private List<int> GetRemainingBoatSizes(Grid grid) {
-		var sunkBoats = grid.Hits.Where(h => h.HasSunk).Select(h => h.SunkenBoat).Distinct();
-		var remainingBoats = grid.Boats.Where(b => !sunkBoats.Contains(b.Name));
-		return remainingBoats.Select(b => b.Size).Distinct().ToList();
-	}
+		List<Position> possiblePositions = [];
 
-	private Position ProbabilisticStategy(Game game, Grid grid) {
-		int[,] probabilityGrid = new int[grid.Size, grid.Size];
-		List<int> remainingBoatSizes = GetRemainingBoatSizes(grid);
-		for (int x = 0; x < grid.Size; x++) {
-			for (int y = 0; y < grid.Size; y++) {
-				if (grid.Hits.Any(hit => hit.X == x && hit.Y == y))
+		foreach (var (row, col) in directions) {
+			foreach (var hit in successfulHits) {
+				if (hit.Col + col < 0 || hit.Col + col >= grid.Size || hit.Row + row < 0 || hit.Row + row >= grid.Size)
 					continue;
-				foreach (var size in remainingBoatSizes) {
-					probabilityGrid[x, y] += CalculateProbability(x, y, size, true, grid);
-					probabilityGrid[x, y] += CalculateProbability(x, y, size, false, grid);
-				}
+				possiblePositions.Add(new(hit.Row + row, hit.Col + col));
 			}
 		}
 
-		int maxProbability = 0;
-		Position nextMove = new(0, 0);
-		for (int x = 0; x < grid.Size; x++) {
-			for (int y = 0; y < grid.Size; y++) {
-				if (probabilityGrid[x, y] > maxProbability) {
-					maxProbability = probabilityGrid[x, y];
-					nextMove = new(x, y);
-				}
-			}
-		}
-		if (maxProbability == 0) {
-			return RandomStategy(game, grid);
-		}
+		possiblePositions = possiblePositions.Where(pos => !grid.Hits.Any(hit => hit.Col == pos.Col && hit.Row == pos.Row)).Distinct().ToList();
 
-		return nextMove;
+		if (possiblePositions.Count != 0) {
+			return possiblePositions[Random.Shared.Next(possiblePositions.Count)];
+		} else {
+			return RandomStrategy(game, grid);
+		}
 	}
-
-	private int CalculateProbability(int x, int y, int size, bool isHorizontal, Grid grid) {
-		int count = 0;
-		int dx = isHorizontal ? 1 : 0;
-		int dy = isHorizontal ? 0 : 1;
-		for (int step = 0; step < size; step++) {
-			int newX = x + step * dx;
-			int newY = y + step * dy;
-			if (newX < grid.Size && newY < grid.Size && !grid.Hits.Any(hit => hit.X == newX && hit.Y == newY)) {
-				count++;
-			} else {
-				break;
-			}
-		}
-		return count == size ? 1 : 0;
-	}
-
 
 }

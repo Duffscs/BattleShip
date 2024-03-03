@@ -25,7 +25,7 @@
 		get => hits;
 		set {
 			hits = value;
-			hits.Sort((a, b) => a.X == b.X ? a.Y.CompareTo(b.Y) : a.X.CompareTo(b.X));
+			hits.Sort((a, b) => a.Col == b.Col ? a.Row.CompareTo(b.Row) : a.Col.CompareTo(b.Col));
 			StateHasChanged();
 		}
 	}
@@ -34,7 +34,7 @@
 
 	public void AddHit(Hit hit) {
 		for (int i = 0; i < hits.Count; i++) {
-			if (hits[i].X > hit.X || (hits[i].X == hit.X && hits[i].Y > hit.Y)) {
+			if (hits[i].Col > hit.Col || (hits[i].Col == hit.Col && hits[i].Row > hit.Row)) {
 				hits.Insert(i, hit);
 				StateHasChanged();
 				return;
@@ -49,9 +49,9 @@
 
 		Hit? hit = null;
 		for (int k = 0; k < hits.Count; k++) {
-			if(hits[k].Y > j || hits[k].X > i && hits[k].Y >= j)
+			if(hits[k].Row > j || hits[k].Col > i && hits[k].Row >= j)
 				break;
-			if(hits[k].X == i && hits[k].Y == j)
+			if(hits[k].Col == i && hits[k].Row == j)
 				hit = hits[k];
 		}
 

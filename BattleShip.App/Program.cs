@@ -6,15 +6,18 @@ using MudBlazor;
 using BattleShip.App.Service;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
+
+
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
-//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7202") });
+
 builder.Services.AddHttpClient("ServerAPI",
-	  client => client.BaseAddress = new Uri(builder.Configuration["ApiHost"]!))
+	  client => client.BaseAddress = new Uri(builder.Configuration["ApiHost"]))
 	.AddHttpMessageHandler(sp => {
 		var httpMessageHandler = sp.GetService<AuthorizationMessageHandler>()?
-			.ConfigureHandler(authorizedUrls: new[] { builder.Configuration["ApiHost"]! });
+			.ConfigureHandler(authorizedUrls: [builder.Configuration["ApiHost"]]);
 		return httpMessageHandler ?? throw new NullReferenceException(nameof(AuthorizationMessageHandler));
 	});
 
@@ -37,6 +40,6 @@ builder.Services.AddMudServices(config => {
 builder.Services.AddOidcAuthentication(options => {
 	builder.Configuration.Bind("Auth0", options.ProviderOptions);
 	options.ProviderOptions.ResponseType = "code";
-	options.ProviderOptions.AdditionalProviderParameters.Add("audience", builder.Configuration["Auth0:Audience"]!);
+	options.ProviderOptions.AdditionalProviderParameters.Add("audience", builder.Configuration["Auth0:Audience"]);
 });
 await builder.Build().RunAsync();

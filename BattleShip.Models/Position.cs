@@ -1,5 +1,5 @@
 ﻿namespace BattleShip.Models;
-public class Position(int x, int y) {
-	public int X { get; set; } = x;
-	public int Y { get; set; } = y;
+public class Position(int row, int col) {
+	public int Row { get; set; } = row;
+	public int Col { get; set; } = col;
 }

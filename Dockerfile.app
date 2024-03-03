@@ -8,7 +8,8 @@ RUN dotnet publish ./BattleShip.App/BattleShip.App.csproj -c Release -o ./publis
 
 FROM nginx:alpine AS final
 
+COPY config/setup_env.sh /docker-entrypoint.d/35-setup_env.sh
 COPY --from=publish /publish/wwwroot /usr/local/webapp/nginx/html
-COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
+EXPOSE 443

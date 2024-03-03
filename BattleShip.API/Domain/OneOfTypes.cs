@@ -8,4 +8,4 @@ namespace BattleShip.API.Domain;
 public partial class GameOrNotFound : OneOfBase<Game, NotFound> {}
 
 [GenerateOneOf]
-public partial class GameStateOrNotFoundOrGameAlreadyFinished: OneOfBase<GameStateDto, NotFound, GameAlreadyFinished> { }
+public partial class GameStateOrGameAlreadyFinished: OneOfBase<GameState, GameAlreadyFinished> { }

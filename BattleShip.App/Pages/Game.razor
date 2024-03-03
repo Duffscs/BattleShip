@@ -11,147 +11,34 @@
 
 <PageTitle>Home</PageTitle>
 @if (gameExist) {
-	<div class="grid opponent-grid">
-		@for (int i = 0; i < GridSize; i++) {
-			@for (int j = 0; j < GridSize; j++) {
-				(int row, int col) = (i, j);
-				<div class="cell @HitStateString(PlayerHitGrid[i,j])"
-					 @onclick="() => ClickCell(row , col)"></div>
+	<div class="grid opponent-grid" style="--grid-size:@GridSize">
+		@for (int row = 0; row < GridSize; row++) {
+			@for (int col = 0; col < GridSize; col++) {
+				(int rowT, int colT) = (row, col);
+				<div class="cell"
+					 @onclick="() => ClickCell(rowT , colT)">
+					<div class="hit @HitStateString(PlayerHitGrid[row,col])"></div>
+				</div>
 			}
 		}
 	</div>
 
-	<div class="grid player-grid">
-		@for (int i = 0; i < GridSize; i++) {
-			@for (int j = 0; j < GridSize; j++) {
-				<div class="cell @HitStateString(OpponentHitGrid[i,j])">
-					@PlayerGrid[i, j]
+	<div class="grid player-grid" style="--grid-size:@GridSize">
+		@for (int row = 0; row < GridSize; row++) {
+			@for (int col = 0; col < GridSize; col++) {
+				<div class="cell @PlayerGrid[row, col]">
+					<div class="hit @HitStateString(OpponentHitGrid[row,col])"> </div>
 				</div>
 			}
 		}
 	</div>
 	<div class="hit-history">
-		<MudPaper Class="pa-3">Historique des coups</MudPaper>
+		<h1>Historique des coups</h1>
 		@foreach (var h in GameHits) {
-			<MudPaper Class="pa-3">@h.Item1 (@h.Item2.X,@h.Item2.Y) @HitStateString(h.Item2)</MudPaper>
+			<p>
+				@h.Item1 (@h.Item2.Row,@h.Item2.Col) @HitStateString(h.Item2)
+			</p>
 		}
 	</div>
-}
-
-@code {
-	[Parameter]
-	public string GameId { get; set; }
-
-	string[,] PlayerGrid { get; set; }
-	int GridSize { get; set; }
-	Hit[,] PlayerHitGrid { get; set; }
-	Hit[,] OpponentHitGrid { get; set; }
-	bool gameFinished;
-	bool gameExist;
-
-	Stack<(string, Hit)> GameHits { get; set; } = new();
-
-	protected override async Task OnInitializedAsync() {
-		if (GameId is null)
-			NavigationManager.NavigateTo("/");
-
-		var res = await Http.GetAsync($"/GetGame/{GameId}");
-		if (!res.IsSuccessStatusCode) {
-			Snackbar.Add("Cette Game n'existe pas.", Severity.Error);
-			return;
-		}
-
-		GameDto g = await res.Content.ReadFromJsonAsync<GameDto>();
-		GridSize = g.GridSize;
-		gameExist = true;
-		PlayerGrid = new string[g.GridSize, g.GridSize];
-		PlayerHitGrid = new Hit[g.GridSize, g.GridSize];
-		OpponentHitGrid = new Hit[g.GridSize, g.GridSize];
-		for (int i = 0; i < g.GridSize; i++) {
-			for (int j = 0; j < g.GridSize; j++) {
-				PlayerGrid[i, j] = "";
-				PlayerHitGrid[i, j] = null;
-				OpponentHitGrid[i, j] = null;
-			}
-		}
-		foreach (var b in g.BoatsPosition) {
-			PlayerGrid[b.X, b.Y] = b.Name;
-		}
-
-		foreach (var h in g.PlayerHits) {
-			PlayerHitGrid[h.X, h.Y] = h;
-		}
-
-		foreach (var h in g.OpponentHits) {
-			OpponentHitGrid[h.X, h.Y] = h;
-		}
-
-		for (int i = 0; i < g.PlayerHits.Count; i++) {
-			GameHits.Push(("Player", g.PlayerHits[i]));
-			if (g.OpponentHits.ElementAtOrDefault(i) != null) {
-				GameHits.Push(("Opponent", g.OpponentHits[i]));
-			}
-		}
-	}
-
-	private async Task ClickCell(int i, int j) {
-		if (gameFinished) {
-			Snackbar.Add("La partie est terminée", Severity.Error);
-			return;
-		}
-		if (PlayerHitGrid[i, j] != null) {
-			Snackbar.Add("Cette cellule a déjà été utilisé", Severity.Error);
-			return;
-		}
-		PlayerHitGrid[i, j] = new();
-		var response = await Http.PostAsJsonAsync("/Hit", new {
-			GameId,
-			X = i,
-			Y = j
-		});
-
-		if (!response.IsSuccessStatusCode) {
-			Snackbar.Add("Erreur lors de l'envoi de la requête", Severity.Error);
-			return;
-		}
-
-		GameStateDto gameState = await response.Content.ReadFromJsonAsync<GameStateDto>();
-		Console.WriteLine(JsonSerializer.Serialize(gameState));
-		PlayerHitGrid[i, j] = gameState.PlayerHit;
-		GameHits.Push(("Player", gameState.PlayerHit));
-		if (gameState.OpponentHit != null) {
-			OpponentHitGrid[gameState.OpponentHit.X, gameState.OpponentHit.Y] = gameState.OpponentHit;
-			GameHits.Push(("Opponent", gameState.OpponentHit));
-		}
-
-		if (gameState.HasWinner) {
-			gameFinished = true;
-			var parameters = new DialogParameters<ValidationDialog>();
-			parameters.Add(x => x.Content, $"Vous avez {(gameState.Winner == 0 ? "Gagné" : "Perdu")}. Rejouer ?");
-			parameters.Add(x => x.CancelText, "Non");
-			parameters.Add(x => x.SubmitText, "Oui");
-			var res = await DialogService.Show<ValidationDialog>("Partie terminée", parameters, new DialogOptions() { CloseButton = true }).Result;
-			if (res.Canceled) {
-				return;
-			}
-			return;
-		}
-	}
-
-	private string HitStateString(Hit hit) {
-		if (hit == null) {
-			return "";
-		}
-
-		if (hit.HasSunk) {
-			return "sunken";
-		}
-
-		if (hit.HasHit) {
-			return "hitted";
-		}
-
-		return "missed";
-	}
 }
 

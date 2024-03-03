@@ -21,11 +21,17 @@
 	<ItemGroup>
 		<ProjectReference Include="..\BattleShip.Models\BattleShip.Models.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="wwwroot\image\" />
+	</ItemGroup>
 
-	<Target Name="CompileStaticAssets" AfterTargets="CoreCompile;TestWebCompiler" Condition="'$(ErrorCode)' == '0'">
-		
-		<Exec Command="webcompiler -r . -c webcompilerconfiguration.json -p disable" StandardOutputImportance="high" StandardErrorImportance="high" />
+	<Target Name="CompileStaticAssets" AfterTargets="BeforeBuild">
+		<Exec Command="webcompiler -r $(MSBuildProjectDirectory) -c $(MSBuildProjectDirectory)/webcompilerconfiguration.json -p disable" StandardOutputImportance="high" StandardErrorImportance="high" />
 	</Target>
 
-	<ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
+	<ProjectExtensions>
+		<VisualStudio>
+			<UserProperties />
+		</VisualStudio>
+	</ProjectExtensions>
 </Project>

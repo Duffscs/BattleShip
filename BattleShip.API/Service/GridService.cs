@@ -29,8 +29,8 @@ public class GridService {
 		boat.IsHorizontal = Random.Shared.Next(2) == 0;
 		bool isPositionValid = false;
 		while (!isPositionValid) {
-			boat.PosX = Random.Shared.Next(boat.IsHorizontal ? grid.Size - boat.Size : grid.Size);
-			boat.PosY = Random.Shared.Next(boat.IsHorizontal ? grid.Size : grid.Size - boat.Size);
+			boat.Row = Random.Shared.Next(boat.IsHorizontal ? grid.Size : grid.Size - boat.Size);
+			boat.Col = Random.Shared.Next(boat.IsHorizontal ? grid.Size - boat.Size : grid.Size);
 			isPositionValid = true;
 			foreach (Boat otherBoat in grid.Boats) {
 				if (IsOverlapping(boat, otherBoat)) {
@@ -43,8 +43,8 @@ public class GridService {
 
 	public Boat? HasHitAny(Grid grid, Position pos) {
 		foreach (Boat boat in grid.Boats) {
-			if (IsHit(boat, pos.X, pos.Y)) {
-				return boat;
+			if (IsHit(boat, pos.Row, pos.Col)) {
+                return boat;
 			}
 		}
 		return null;
@@ -52,30 +52,20 @@ public class GridService {
 
 	private bool IsOverlapping(Boat boat, Boat otherBoat) {
 		for (int i = 0; i < boat.Size; i++) {
-			int x = boat.PosX;
-			int y = boat.PosY;
-			if (boat.IsHorizontal) {
-				x += i;
-			} else {
-				y += i;
-			}
-			if (IsHit(otherBoat, x, y)) {
+			int row = boat.IsHorizontal ? boat.Row : boat.Row + i;
+			int col = boat.IsHorizontal ? boat.Col + i : boat.Col;
+			if (IsHit(otherBoat, row, col)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private bool IsHit(Boat boat, int x, int y) {
+	private bool IsHit(Boat boat, int row, int col) {
 		for (int i = 0; i < boat.Size; i++) {
-			int boatX = boat.PosX;
-			int boatY = boat.PosY;
-			if (boat.IsHorizontal) {
-				boatX += i;
-			} else {
-				boatY += i;
-			}
-			if (boatX == x && boatY == y) {
+			int boatRow = boat.IsHorizontal	? boat.Row : boat.Row + i;
+			int boatCol = boat.IsHorizontal	? boat.Col + i : boat.Col;
+			if (boatRow == row && boatCol == col) {
 				return true;
 			}
 		}

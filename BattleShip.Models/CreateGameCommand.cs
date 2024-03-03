@@ -1,2 +1,2 @@
 ﻿namespace BattleShip.Models;
-public record struct CreateGameCommand(bool Ai, int AiDifficulty) {}
+public record class CreateGameCommand(bool Ai, int AiDifficulty, int GridSize) {}

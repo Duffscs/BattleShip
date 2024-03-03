@@ -2,8 +2,8 @@
 public class Boat {
 	public string Name { get; set; }
 	public int Size { get; set; }
-	public int PosX { get; set; }
-	public int PosY { get; set; }
+	public int Row { get; set; }
+	public int Col { get; set; }
 
 	public int Life { get; set; }
 
@@ -12,8 +12,8 @@ public class Boat {
 	public Boat(string name, int taille) {
 		Name = name;
 		Size = taille;
-		PosX = -taille;
-		PosY = -taille;
+		Row = -taille;
+		Col = -taille;
 		Life = taille;
 	}
 }

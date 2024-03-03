@@ -1,7 +1,11 @@
 ﻿<MudDialog>
 	<DialogContent>
-		<MudSlider @bind-Value="Size" Min="50" Max="30" Color="Color.Info">Taille de la grille: @Size.ToString()</MudSlider>
-			<MudCheckBox @bind-Value="@Ai" Label="Ai" Color="Color.Primary"></MudCheckBox>
+		<MudSlider @bind-Value="Size" Min="Const.MinGridSize" Max="Const.MaxGridSize" Color="Color.Info">Taille de la grille: @Size.ToString()</MudSlider>
+			<MudSelect T="int" Label="Difficulté" @bind-Value="Difficulty">
+				<MudSelectItem T="int" Value="1">Facile</MudSelectItem>
+				<MudSelectItem T="int" Value="2">Moyen</MudSelectItem>
+				<MudSelectItem T="int" Value="3">Difficile</MudSelectItem>
+			</MudSelect>
 		</DialogContent>
 		<DialogActions>
 			<MudButton OnClick="Cancel">Annuler</MudButton>
@@ -12,9 +16,17 @@
 	@code {
 	private int Size = 10;
 	private bool Ai = false;
+	private int Difficulty = 1;
+
 	[CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-	void Submit() => MudDialog.Close(DialogResult.Ok(new { Size, Ai }));
+	void Submit() => MudDialog.Close(DialogResult.Ok(new CreateGameDialogResults { Size = Size, Ai = true, Difficulty = Difficulty }));
 	void Cancel() => MudDialog.Cancel();
+
+	public class CreateGameDialogResults {
+		public int Size { get; set; }
+		public int Difficulty { get; set; }
+		public bool Ai { get; set; }
+	}
 }
 

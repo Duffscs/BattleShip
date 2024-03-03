@@ -18,6 +18,7 @@ app.RegisterGameController();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.UseCors((c) => {
 	c.AllowAnyMethod();
 	c.AllowAnyOrigin();

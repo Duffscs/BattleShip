@@ -11,44 +11,58 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 5px;
+  grid-template-columns: repeat(var(--grid-size), 1fr);
   width: -webkit-fit-content;
   width: -moz-fit-content;
   width: fit-content;
   height: -webkit-fit-content;
   height: -moz-fit-content;
   height: fit-content;
-  --grid-cell-color: transparent;
   --grid-cell-size: 50px;
   --grid-cell-image: none;
+  border: gray 20px solid;
+  border-radius: 20px;
+  background-color: rgba(0, 0, 0, 0.431372549);
 }
 .grid .cell {
   width: var(--grid-cell-size);
   height: var(--grid-cell-size);
+  border: dashed gray 0.5px;
   background-image: var(--grid-cell-image);
+  background-size: var(--grid-cell-size);
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.grid .cell.bow {
+  --grid-cell-image: url("image/bow.svg") ;
+}
+.grid .cell.stern {
+  --grid-cell-image: url("image/stern.svg") ;
+}
+.grid .cell.hull {
+  --grid-cell-image: url("image/hull.svg") ;
+}
+.grid .cell.horizontal {
+  -webkit-transform: rotate(-90deg);
+      -ms-transform: rotate(-90deg);
+          transform: rotate(-90deg);
+}
+.grid .cell .hit {
+  width: 100%;
+  height: 100%;
+  background-image: var(--grid-cell-hit-image);
   background-size: 32px;
   background-position: center;
   background-repeat: no-repeat;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  border: solid black 1px;
 }
-.grid .cell.sunken {
-  --grid-cell-image: url("sunken.svg") ;
+.grid .cell .hit.sunken {
+  --grid-cell-hit-image: url("image/sunken.svg") ;
 }
-.grid .cell.hitted {
-  --grid-cell-image: url("hit.svg") ;
+.grid .cell .hit.hitted {
+  --grid-cell-hit-image: url("image/hit.svg") ;
 }
-.grid .cell.missed {
-  --grid-cell-image: url("missed.svg") ;
+.grid .cell .hit.missed {
+  --grid-cell-hit-image: url("image/missed.svg") ;
 }
 
 .hit-history {
@@ -56,6 +70,7 @@
   height: 100vh;
   position: fixed;
   right: 0;
-  top: 0;
+  top: 20px;
+  background-color: white;
 }
 /*# sourceMappingURL=C:\Users\duffs\Desktop\code\BatailleNaval\BattleShip.App\Pages\Game.razor.css.map */
