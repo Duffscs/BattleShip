@@ -2,6 +2,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS publish
 
 COPY . .
 
+RUN dotnet tool install Excubo.WebCompiler --global
+
 RUN dotnet restore
 
 RUN dotnet publish ./BattleShip.App/BattleShip.App.csproj -c Release -o ./publish
